@@ -1,0 +1,218 @@
+﻿@{ViewBag.Title = "Add New Contact to my Phone Book";
+}
+
+@model CIBDigiTechAssessment.MVC.ViewModel.CreateUpdatePhoneBookViewModel
+<h2>Add Entry to my Phone Book</h2>
+
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+<script src="~/Scripts/modernizr-2.8.3.js"></script>
+<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+
+<style>
+    table {
+        table-layout: fixed;
+    }
+
+    td {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+@using (Html.BeginForm("create", "PhoneBook", FormMethod.Post, new { id = "PhoneBookForm" }))
+{
+
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="row">
+        <br />
+        <div class="col-md-9"></div>
+        <div class="col-md-3 footer-buttons">
+            <button type="button" class="btn btn-secondary float-right" onclick="location.href='@Url.Action("Index", "PhoneBook")'">Cancel</button>
+            <button type="button" style="margin-right: 5px;" class="btn btn-primary float-right" id="btnAddEntry">Add Entry</button>
+        </div>
+    </div>
+    <br />
+    <br />
+    <div align="center">
+        <span id="Error" class="text-danger" name="Error"></span>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="tab-content">
+                    <table class="table">
+                        <tr>
+                            <td>
+                                @Html.LabelFor(model => model.FirstName)
+                                <span class="text-danger">*</span>
+                            </td>
+                            <td>
+                                @Html.EditorFor(model => model.FirstName, new { htmlAttributes = new { @class = "form-control", @id = "txtFirstName" } })
+                                @Html.ValidationMessageFor(model => model.FirstName)
+                                <span id="valFirstName" class="text-danger" name="valFirstName"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.LabelFor(model => model.LastName)
+                                <span class="text-danger">*</span>
+                            </td>
+                            <td>
+                                @Html.EditorFor(model => model.LastName, new { htmlAttributes = new { @class = "form-control", @id = "txtLastName" } })
+                                @Html.ValidationMessageFor(model => model.LastName)
+                                <span id="valLastName" class="text-danger" name="valLastName"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.LabelFor(model => model.Contact)
+                                <span class="text-danger">*</span>
+                            </td>
+                            <td>
+                                @Html.EditorFor(model => model.Contact, new { htmlAttributes = new { @class = "form-control", @id = "txtContact" } })
+                                @Html.ValidationMessageFor(model => model.Contact)
+                                <span id="valContact" class="text-danger" name="valContact"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.LabelFor(model => model.Email)
+                                <span class="text-danger">*</span>
+                            </td>
+                            <td>
+                                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", @id = "txtEmail" } })
+                                @Html.ValidationMessageFor(model => model.Email)
+                                <span id="valEmail" class="text-danger" name="valEmail"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.LabelFor(model => model.Address)
+                                <span class="text-danger">*</span>
+                            </td>
+                            <td>
+                                @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control", @id = "txtAddress" } })
+                                @Html.ValidationMessageFor(model => model.Address)
+                                <span id="valAddress" class="text-danger" name="valAddress"></span>
+                            </td>
+                        </tr>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+}
+
+<script type="text/javascript">
+        function GetFormData() {
+            var PhoneBookDetails = {};
+            var PhoneBookList = [];
+
+            PhoneBookDetails["FirstName"] = $("#txtFirstName").val();
+            PhoneBookDetails["LastName"] = $("#txtLastName").val();
+            PhoneBookDetails["Contact"] = $("#txtContact").val();
+            PhoneBookDetails["Email"] = $("#txtEmail").val();
+            PhoneBookDetails["Address"] = $("#txtAddress").val();
+            PhoneBookList.push(PhoneBookDetails);
+
+            return JSON.stringify(PhoneBookList);
+        }
+
+        function clearFields() {
+            $("#valFirstName").text("");
+            $("#txtFirstName").css('background', 'white');
+            $("#valLastName").text("");
+            $("#txtLastName").css('background', 'white');
+            $("#valContact").text("");
+            $("#txtContact").css('background', 'white');
+            $("#valEmail").text("");
+            $("#txtEmail").css('background', 'white');
+            $("#valAddress").text("");
+            $("#txtAddress").css('background', 'white');
+        }
+
+        function showErrors() {
+        var errorBanners = [];
+        clearErrors();
+
+        $('.field-validation-error').each(function (element) {
+            var el = $(this);
+
+            if (el.html().trim().length) {
+                var parentPane = el.closest(".tab-pane");
+                var parentLink = $("a[href='#" + parentPane.attr('id') + "']");
+                parentLink.effect("highlight", { color: '#990000' }, 4000);;
+
+                var errorSpan = parentLink.find('.error-count');
+                errorSpan.css('display', 'inline-block');
+                if (errorSpan.text().trim().length) {
+                    var existingError = parseInt(errorSpan.text());
+                    errorSpan.text(++existingError);
+                }
+                else {
+                    errorSpan.text(1);
+                }
+            }
+        });
+    }
+
+    $("#btnAddEntry").click(function () {
+
+        var PhoneBooksJson = GetFormData();
+        var getParams = {
+            "PhoneBooksJson": PhoneBooksJson
+        };
+
+        $.ajax({
+            type: "POST",
+            traditional: true,
+            async: false,
+            cache: false,
+             url: '@Url.Action("Create", "PhoneBook")',
+            context: document.body,
+            data: getParams,
+            success: function (result) {
+                if (result.Success) {
+                var url = '@Url.Action("Index", "PhoneBook")';
+                    window.location.href = url;}
+                else {
+                    if (result.ErrorVal == "Number already exists.") {
+                        $("#Error").text(result.ErrorVal);
+                        $("#txtContact").css('background', '#ffeeee');
+                    }
+                    else {
+                        var errors = result.Error.split('.');
+                        for (var i = 0; i < errors.length - 1; i++) {
+                            if (errors[i].indexOf("FirstName") != -1) {
+                                $("#valFirstName").text(errors[i]);
+                                $("#txtFirstName").css('background', '#ffeeee');
+                            }
+                            else if (errors[i].indexOf("LastName") != -1) {
+                                $("#valLastName").text(errors[i]);
+                                $("#txtLastName").css('background', '#ffeeee');
+                            }
+                            else if (errors[i].indexOf("Email") != -1) {
+                                $("#valEmail").text(errors[i]);
+                                $("#txtEmail").css('background', '#ffeeee');
+                            }
+                            else if (errors[i].indexOf("Address") != -1) {
+                                $("#valAddress").text(errors[i]);
+                                $("#txtAddress").css('background', '#ffeeee');
+                            }
+                        }
+                    }
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                alert("Error has occurred..");
+            }
+        });
+    });
+
+</script>
